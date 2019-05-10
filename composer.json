@@ -15,8 +15,8 @@
     "require": {
         "php": ">=5.4.0",
         "lispa/amos-core" : "*",
-        "raoul2000/yii2-workflow": "~1.1.0",
-        "cornernote/yii2-workflow-manager": "~1.0.1"
+        "raoul2000/yii2-workflow": "^1.1.0",
+        "cornernote/yii2-workflow-manager": "^1.0.1"
     },
     "extra": {
         "asset-installer-paths": {

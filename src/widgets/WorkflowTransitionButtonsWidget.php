@@ -679,6 +679,9 @@ class WorkflowTransitionButtonsWidget extends Widget
                     $js = <<<JS
                     var clickedWorkflowTransitionButton = false; // this variable is used to avoid to open the modal if you don't click on submit buttons that aren't in the transition widget
                     var modalShown = false;
+                    var clickedButtonsConfirm = false;
+                    var form = $('#modal-notify-send-email').parents('form');
+                    
                     $(document).on('submit','form', function(e){
                         if(!modalShown && clickedWorkflowTransitionButton) {
                             e.preventDefault();
@@ -689,20 +692,28 @@ class WorkflowTransitionButtonsWidget extends Widget
                     
                     $('#confirm-true').click(function(e){
                          e.preventDefault();
-                         modalShown = true;
-                        $('#save-notification-send-email').val(1);
-                        $('form').trigger('submit');
+                         if(!clickedButtonsConfirm){
+                             modalShown = true;
+                             clickedButtonsConfirm = true;
+                            $('#save-notification-send-email').val(1);
+                            $(form).trigger('submit');
+                        }
                     });
                     
                      $('#confirm-false').click(function(e){
                          e.preventDefault();
-                         modalShown = true;
-                        $('form').trigger('submit')
+                         if(!clickedButtonsConfirm){
+                             modalShown = true;
+                             clickedButtonsConfirm = true;
+                            $(form).trigger('submit');
+                        }
                     });
                      
                      $('#modal-notify-send-email').on('hidden.bs.modal', function () {
                          modalShown = true;
-                        $('form').trigger('submit');
+                         if(!clickedButtonsConfirm){
+                            $(form).trigger('submit');
+                        }
                      });
                      
                      $('.workflow-transition-button-widget button[type="submit"]').click(function(){
@@ -711,6 +722,7 @@ class WorkflowTransitionButtonsWidget extends Widget
                     
 JS;
                     $this->getView()->registerJs($js);
+
 
                     ModalUtility::createConfirmModal([
                         'id' => 'modal-notify-send-email',
