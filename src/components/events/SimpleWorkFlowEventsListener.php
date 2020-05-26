@@ -1,18 +1,18 @@
 <?php
 
 /**
- * Lombardia Informatica S.p.A.
+ * Aria S.p.A.
  * OPEN 2.0
  *
  *
- * @package    lispa\amos\workflow
+ * @package    open20\amos\workflow
  * @category   CategoryName
  */
 
-namespace lispa\amos\workflow\components\events;
+namespace open20\amos\workflow\components\events;
 
-use lispa\amos\workflow\models\WorkflowTransitionsLog;
-use lispa\amos\core\record\Record;
+use open20\amos\workflow\models\WorkflowTransitionsLog;
+use open20\amos\core\record\Record;
 use raoul2000\workflow\events\WorkflowEvent;
 use yii\base\Component;
 use yii\db\ActiveQuery;

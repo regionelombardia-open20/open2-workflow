@@ -1,27 +1,27 @@
 <?php
 
 /**
- * Lombardia Informatica S.p.A.
+ * Aria S.p.A.
  * OPEN 2.0
  *
  *
- * @package    lispa\amos\workflow
+ * @package    open20\amos\workflow
  * @category   CategoryName
  */
 
-namespace lispa\amos\workflow;
+namespace open20\amos\workflow;
 
-use lispa\amos\core\module\Module;
-use lispa\amos\core\module\ModuleInterface;
-use lispa\amos\core\record\Record;
-use lispa\amos\workflow\components\events\SimpleWorkFlowEventsListener;
+use open20\amos\core\module\Module;
+use open20\amos\core\module\ModuleInterface;
+use open20\amos\core\record\Record;
+use open20\amos\workflow\components\events\SimpleWorkFlowEventsListener;
 use raoul2000\workflow\base\SimpleWorkflowBehavior;
 use Yii;
 use yii\base\Event;
 
 /**
  * Class AmosWorkflow
- * @package lispa\amos\workflow
+ * @package open20\amos\workflow
  */
 class AmosWorkflow extends Module implements ModuleInterface
 {

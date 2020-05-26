@@ -1,20 +1,20 @@
 <?php
 
 /**
- * Lombardia Informatica S.p.A.
+ * Aria S.p.A.
  * OPEN 2.0
  *
  *
- * @package    lispa\amos\core\forms
+ * @package    open20\amos\core\forms
  * @category   CategoryName
  */
 
-namespace lispa\amos\workflow\widgets;
+namespace open20\amos\workflow\widgets;
 
 use DOMDocument;
-use lispa\amos\core\forms\CloseSaveButtonWidget;
-use lispa\amos\core\module\BaseAmosModule;
-use lispa\amos\core\record\Record;
+use open20\amos\core\forms\CloseSaveButtonWidget;
+use open20\amos\core\module\BaseAmosModule;
+use open20\amos\core\record\Record;
 use kartik\widgets\Select2;
 use raoul2000\workflow\base\Status;
 use yii\base\InvalidConfigException;
@@ -24,7 +24,7 @@ use yii\base\InvalidConfigException;
  * Renders the widget useful to change a model workflow status showing
  * only a save button for the user.
  *
- * @package lispa\amos\workflow\widgets
+ * @package open20\amos\workflow\widgets
  */
 class WorkflowTransitionSimplifiedButtonsWidget extends WorkflowTransitionButtonsWidget
 {
@@ -177,7 +177,7 @@ class WorkflowTransitionSimplifiedButtonsWidget extends WorkflowTransitionButton
         $inState = $this->model->status;
 
         if (!is_array($this->transitionStatuses)) {
-            throw new InvalidConfigException("\\lispa\amos\workflow\widgets\WorkflowTransitionSimplifiedButtonsWidget:\n the param transitionStatuses must be an array.");
+            throw new InvalidConfigException("\\open20\amos\workflow\widgets\WorkflowTransitionSimplifiedButtonsWidget:\n the param transitionStatuses must be an array.");
         }
 
         $saveButton = [];

@@ -1,17 +1,17 @@
 <?php
 
 /**
- * Lombardia Informatica S.p.A.
+ * Aria S.p.A.
  * OPEN 2.0
  *
  *
- * @package    lispa\amos\workflow
+ * @package    open20\amos\workflow
  * @category   CategoryName
  */
 
-namespace lispa\amos\workflow\models;
+namespace open20\amos\workflow\models;
 
-use lispa\amos\workflow\models\base\WorkflowTransitionsLog as WorkflowTransitionsLogBase;
+use open20\amos\workflow\models\base\WorkflowTransitionsLog as WorkflowTransitionsLogBase;
 /**
  * This is the model class for table "workflow_transitions_log".
  */

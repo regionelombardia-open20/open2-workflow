@@ -1,25 +1,25 @@
 <?php
 
 /**
- * Lombardia Informatica S.p.A.
+ * Aria S.p.A.
  * OPEN 2.0
  *
  *
- * @package    lispa\amos\workflow\behaviors
+ * @package    open20\amos\workflow\behaviors
  * @category   CategoryName
  */
 
-namespace lispa\amos\workflow\behaviors;
+namespace open20\amos\workflow\behaviors;
 
-use lispa\amos\core\record\Record;
-use lispa\amos\workflow\components\events\SimpleWorkFlowEventsListener;
-use lispa\amos\workflow\models\WorkflowTransitionsLog;
+use open20\amos\core\record\Record;
+use open20\amos\workflow\components\events\SimpleWorkFlowEventsListener;
+use open20\amos\workflow\models\WorkflowTransitionsLog;
 use yii\base\Behavior;
 use yii\helpers\Json;
 
 /**
  * Class WorkflowLogFunctionsBehavior
- * @package lispa\amos\workflow\behaviors
+ * @package open20\amos\workflow\behaviors
  */
 class WorkflowLogFunctionsBehavior extends Behavior
 {

@@ -1,15 +1,15 @@
 <?php
 
 /**
- * Lombardia Informatica S.p.A.
+ * Aria S.p.A.
  * OPEN 2.0
  *
  *
- * @package    lispa\amos\workflow
+ * @package    open20\amos\workflow
  * @category   CategoryName
  */
 
-namespace lispa\amos\workflow\models\base;
+namespace open20\amos\workflow\models\base;
 
 use Yii;
 use yii\helpers\Json;
@@ -31,7 +31,7 @@ use yii\helpers\Json;
  * @property integer $updated_by
  * @property integer $deleted_by
  */
-class WorkflowTransitionsLog extends \lispa\amos\core\record\Record
+class WorkflowTransitionsLog extends \open20\amos\core\record\Record
 {
 
     /**

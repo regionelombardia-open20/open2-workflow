@@ -1,22 +1,22 @@
 <?php
 
 /**
- * Lombardia Informatica S.p.A.
+ * Aria S.p.A.
  * OPEN 2.0
  *
  *
- * @package    lispa\amos\workflow\widgets
+ * @package    open20\amos\workflow\widgets
  * @category   CategoryName
  */
 
-namespace lispa\amos\workflow\widgets;
+namespace open20\amos\workflow\widgets;
 
-use lispa\amos\core\controllers\CrudController;
-use lispa\amos\core\forms\ActiveForm;
-use lispa\amos\core\module\AmosModule;
-use lispa\amos\core\module\BaseAmosModule;
-use lispa\amos\core\record\Record;
-use lispa\amos\core\utilities\WorkflowTransitionWidgetUtility;
+use open20\amos\core\controllers\CrudController;
+use open20\amos\core\forms\ActiveForm;
+use open20\amos\core\module\AmosModule;
+use open20\amos\core\module\BaseAmosModule;
+use open20\amos\core\record\Record;
+use open20\amos\core\utilities\WorkflowTransitionWidgetUtility;
 use kartik\base\Widget;
 use raoul2000\workflow\base\Status;
 
@@ -24,7 +24,7 @@ use raoul2000\workflow\base\Status;
  * Class WorkflowTransitionStateDescriptorWidget
  * Renders the widget useful to view the workflow status of a model.
  *
- * @package lispa\amos\core\forms
+ * @package open20\amos\core\forms
  */
 class WorkflowTransitionStateDescriptorWidget extends Widget
 {
@@ -142,6 +142,7 @@ class WorkflowTransitionStateDescriptorWidget extends Widget
     private $translationCategory;
 
     /**
+     * @see \kartik\base\Widget::init();
      *
      * Set of the permissionSave
      */

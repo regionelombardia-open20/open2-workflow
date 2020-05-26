@@ -1,22 +1,22 @@
 <?php
 
 /**
- * Lombardia Informatica S.p.A.
+ * Aria S.p.A.
  * OPEN 2.0
  *
  *
- * @package    lispa\amos\core\forms
+ * @package    open20\amos\core\forms
  * @category   CategoryName
  */
 
-namespace lispa\amos\workflow\widgets;
+namespace open20\amos\workflow\widgets;
 
-use lispa\amos\core\controllers\CrudController;
-use lispa\amos\core\forms\CloseSaveButtonWidget;
-use lispa\amos\core\icons\AmosIcons;
-use lispa\amos\core\module\AmosModule;
-use lispa\amos\core\module\BaseAmosModule;
-use lispa\amos\core\record\Record;
+use open20\amos\core\controllers\CrudController;
+use open20\amos\core\forms\CloseSaveButtonWidget;
+use open20\amos\core\icons\AmosIcons;
+use open20\amos\core\module\AmosModule;
+use open20\amos\core\module\BaseAmosModule;
+use open20\amos\core\record\Record;
 use kartik\base\Widget;
 use kartik\select2\Select2;
 use raoul2000\workflow\base\Status;
@@ -28,7 +28,7 @@ use yii\db\ActiveRecord;
  * Class WorkflowStateWidget
  * Renders the widget useful to change a model workflow status.
  *
- * @package lispa\amos\core\forms
+ * @package open20\amos\core\forms
  */
 class WorkflowTransitionWidget extends Widget
 {
@@ -151,6 +151,7 @@ class WorkflowTransitionWidget extends Widget
     private $translationCategory;
     
     /**
+     * @see \kartik\base\Widget::init();
      *
      * Set of the permissionSave
      */
