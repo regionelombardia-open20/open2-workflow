@@ -166,6 +166,14 @@ class WorkflowTransitionButtonsWidget extends Widget
     public $hideSaveDraftStatus;
     public $draftButton;
     public $draftLabel;
+    public $enableConfirmNotification = true;
+
+    /**
+     * For multiple instance of this widget in the same page
+     * default value "workflow-status_id"
+     * @var $internalWorkflowStatusId
+     */
+    public $internalWorkflowStatusId = 'workflow-status_id';
 
     /**
      *  You can insert the save button for a specific status
@@ -330,7 +338,7 @@ class WorkflowTransitionButtonsWidget extends Widget
                     if (!buttonId) {
                         buttonId = '" . $workflowStatusId . "' 
                     }
-                    $('#workflow-status_id').val(buttonId);
+                    $('#".$this->internalWorkflowStatusId."').val(buttonId);
                 });
                 
                 $('[type=submit]').on('click', function(){
@@ -362,7 +370,7 @@ class WorkflowTransitionButtonsWidget extends Widget
                 ];
             }
 
-            $hiddenActions = $this->form->field($this->model, $this->statusField)->hiddenInput(['id' => 'workflow-status_id'])->label(false);
+            $hiddenActions = $this->form->field($this->model, $this->statusField)->hiddenInput(['id' => $this->internalWorkflowStatusId])->label(false);
 
             $notificationInput = $this->renderInputForNotify();
 
@@ -682,14 +690,15 @@ class WorkflowTransitionButtonsWidget extends Widget
             && $this->model instanceof \open20\amos\core\interfaces\WorkflowModelInterface
             && $this->model instanceof ContentModel
         ) {
-            if ($this->model->hasProperty('saveNotificationSendEmail') && !empty($notifyModule->confirmEmailNotification) && $notifyModule->confirmEmailNotification == true) {
-                $validatedStatus = $this->model->getValidatedStatus();
-                $isValidatedOnce = $this->model->getValidatedOnce();
-                $emailNotificated = \open20\amos\notificationmanager\models\NotificationSendEmail::findOne(['classname' => get_class($this->model), 'content_id' => $this->model->id]);
-                if (empty($emailNotificated)) {
-                    // the modal is shown if you click (Validate/publish) or after the validation if you have not selected yes on send notification
-                    // the first time you click for submit open the modal enc do the prevent default, if in the modal click yes, trigger again the submit without open the modal
-                    $js = <<<JS
+            if ($this->enableConfirmNotification == true) {
+                if ($this->model->hasProperty('saveNotificationSendEmail') && !empty($notifyModule->confirmEmailNotification) && $notifyModule->confirmEmailNotification == true) {
+                    $validatedStatus = $this->model->getValidatedStatus();
+                    $isValidatedOnce = $this->model->getValidatedOnce();
+                    $emailNotificated = \open20\amos\notificationmanager\models\NotificationSendEmail::findOne(['classname' => get_class($this->model), 'content_id' => $this->model->id]);
+                    if (empty($emailNotificated)) {
+                        // the modal is shown if you click (Validate/publish) or after the validation if you have not selected yes on send notification
+                        // the first time you click for submit open the modal enc do the prevent default, if in the modal click yes, trigger again the submit without open the modal
+                        $js = <<<JS
                     var clickedWorkflowTransitionButton = false; // this variable is used to avoid to open the modal if you don't click on submit buttons that aren't in the transition widget
                     var modalShown = false;
                     var clickedButtonsConfirm = false;
@@ -740,19 +749,20 @@ class WorkflowTransitionButtonsWidget extends Widget
                           }
                      });
 JS;
-                    $this->getView()->registerJs($js);
+                        $this->getView()->registerJs($js);
 
-                    ModalUtility::createConfirmModal([
-                        'id' => 'modal-notify-send-email',
-                        'containerOptions' => ['class' => 'modal-utility'],
-                        'modalDescriptionText' => AmosWorkflow::tHtml('amosworkflow', 'Vuoi inviare le email di avviso agli utenti per la pubblicazione di questo contenuto?'),
-                        'confirmBtnOptions' => ['id' => 'confirm-true', 'class' => 'btn btn-navigation-primary'],
-                        'cancelBtnOptions' => ['id' => 'confirm-false', 'class' => 'btn btn-secondary', 'data-dismiss' => 'modal'],
-                        'cancelBtnLabel' => AmosWorkflow::tHtml('amosworkflow', 'No'),
-                        'confirmBtnLabel' => AmosWorkflow::tHtml('amosworkflow', 'Si'),
-                    ]);
+                        ModalUtility::createConfirmModal([
+                            'id' => 'modal-notify-send-email',
+                            'containerOptions' => ['class' => 'modal-utility'],
+                            'modalDescriptionText' => AmosWorkflow::tHtml('amosworkflow', 'Vuoi inviare le email di avviso agli utenti per la pubblicazione di questo contenuto?'),
+                            'confirmBtnOptions' => ['id' => 'confirm-true', 'class' => 'btn btn-navigation-primary'],
+                            'cancelBtnOptions' => ['id' => 'confirm-false', 'class' => 'btn btn-secondary', 'data-dismiss' => 'modal'],
+                            'cancelBtnLabel' => AmosWorkflow::tHtml('amosworkflow', 'No'),
+                            'confirmBtnLabel' => AmosWorkflow::tHtml('amosworkflow', 'Si'),
+                        ]);
 
-                    return Html::hiddenInput('saveNotificationSendEmail', $this->model->saveNotificationSendEmail, ['id' => 'save-notification-send-email']);
+                        return Html::hiddenInput('saveNotificationSendEmail', $this->model->saveNotificationSendEmail, ['id' => 'save-notification-send-email']);
+                    }
                 }
             }
         }
