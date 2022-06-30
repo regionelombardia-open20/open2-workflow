@@ -5,7 +5,7 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\core\forms
+ * @package    open20\amos\workflow\widgets
  * @category   CategoryName
  */
 
@@ -15,7 +15,6 @@ use DOMDocument;
 use open20\amos\core\forms\CloseSaveButtonWidget;
 use open20\amos\core\module\BaseAmosModule;
 use open20\amos\core\record\Record;
-use kartik\widgets\Select2;
 use raoul2000\workflow\base\Status;
 use yii\base\InvalidConfigException;
 
@@ -123,10 +122,7 @@ class WorkflowTransitionSimplifiedButtonsWidget extends WorkflowTransitionButton
 
             }
 
-            $hiddenActions = $this->form->field($this->model, 'status', ['options' => ['style' => 'display:none;']])->widget(Select2::classname(), [
-                'options' => ['id' => 'workflow-status_id'],
-                'data' => $this->statuses,
-            ])->label(false);
+            $hiddenActions = $this->form->field($this->model, 'status')->hiddenInput(['id' => 'workflow-status_id'])->label(false);
 
             $notificationInput = $this->renderInputForNotify();
 

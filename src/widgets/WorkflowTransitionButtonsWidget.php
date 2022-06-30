@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Aria S.p.A.
  * OPEN 2.0
@@ -12,6 +13,7 @@ namespace open20\amos\workflow\widgets;
 
 use DOMDocument;
 use open20\amos\core\controllers\CrudController;
+use open20\amos\core\forms\ActiveField;
 use open20\amos\core\forms\ActiveForm;
 use open20\amos\core\forms\CloseSaveButtonWidget;
 use open20\amos\core\helpers\Html;
@@ -22,7 +24,6 @@ use open20\amos\core\utilities\ModalUtility;
 use open20\amos\core\utilities\WorkflowTransitionWidgetUtility;
 use open20\amos\workflow\AmosWorkflow;
 use kartik\base\Widget;
-use kartik\widgets\Select2;
 use raoul2000\workflow\base\Status;
 use raoul2000\workflow\base\Transition;
 use raoul2000\workflow\base\Workflow;
@@ -184,7 +185,11 @@ class WorkflowTransitionButtonsWidget extends Widget
     public $inView = false;
 
     /**
-     * @see \kartik\base\Widget::init();
+     * @var string $statusField
+     */
+    public $statusField = 'status';
+
+    /**
      *
      * Set of the permissionSave
      */
@@ -357,26 +362,36 @@ class WorkflowTransitionButtonsWidget extends Widget
                 ];
             }
 
-            $hiddenActions = $this->form->field($this->model, 'status', ['options' => ['style' => 'display:none;']])->widget(Select2::classname(),
-                [
-                    'options' => ['id' => 'workflow-status_id'],
-                    'data' => $this->statuses,
-                ])->label(false);
+            $hiddenActions = $this->form->field($this->model, $this->statusField)->hiddenInput(['id' => 'workflow-status_id'])->label(false);
 
             $notificationInput = $this->renderInputForNotify();
 
             // Renderizzo separatamente una view con tutti i bottoni
-            return $this->render("transition-buttons-render",
-                [
-                    'widgetClass' => $this->containerWidgetClass,
-                    'resetButton' => $this->closeButton,
-                    'buttons' => $btns,
-                    'hiddenActions' => $hiddenActions,
-                    'notificationInput' => $notificationInput
-                ]);
+            return $this->render("transition-buttons-render", [
+                'widgetClass' => $this->containerWidgetClass,
+                'resetButton' => $this->closeButton,
+                'buttons' => $btns,
+                'hiddenActions' => $hiddenActions,
+                'renderStatusError' => $this->renderStatusError($hiddenActions),
+                'notificationInput' => $notificationInput
+            ]);
         } else {
             return '';
         }
+    }
+
+    /**
+     * @param ActiveField $hiddenActions
+     * @return string
+     */
+    private function renderStatusError($hiddenActions)
+    {
+        $statusErrors = $this->model->getErrors($this->statusField);
+        $renderStatusError = '';
+        if (!empty($statusErrors)) {
+            $renderStatusError = Html::error($this->model, $this->statusField, $hiddenActions->errorOptions);
+        }
+        return $renderStatusError;
     }
 
     /**
@@ -393,6 +408,7 @@ class WorkflowTransitionButtonsWidget extends Widget
             return [];
         }
 
+        $statusField = $this->statusField;
         $this->statuses = !$statusToRender ? $this->getStatuses() : $statusToRender;
 
         $currentStatus = !$fakeStatusName ? $this->getCurrentStatus() : $fakeStatusName;
@@ -410,9 +426,9 @@ class WorkflowTransitionButtonsWidget extends Widget
         $realState = $nameClass::findOne($findOneKey);
 
         if ($realState) {
-            $this->model->status = $realState->status;
+            $this->model->{$statusField} = $realState->status;
         } else {
-            $this->model->status = $fakeStatus;
+            $this->model->{$statusField} = $fakeStatus;
         }
 
         foreach ($this->statuses as $key => $State) {
@@ -446,7 +462,7 @@ class WorkflowTransitionButtonsWidget extends Widget
                         if ($customStatusLabelDescription != null) {
                             if (is_array($customStatusLabelDescription)) {
                                 foreach ($customStatusLabelDescription as $keyCurrentStatus => $currStatus) {
-                                    if ($this->model->status == $keyCurrentStatus) {
+                                    if ($this->model->{$statusField} == $keyCurrentStatus) {
                                         if (is_array($currStatus)) {
                                             foreach ($currStatus as $keyButtonStatus => $buttonStatus) {
                                                 if ($keyButtonStatus == $state->getId()) {
@@ -489,7 +505,7 @@ class WorkflowTransitionButtonsWidget extends Widget
                 }
             }
         }
-        // order status by sw_metadata  order
+        // Order status by sw_metadata order
         if (!empty($buttons[0]['order'])) {
             usort($buttons, function ($a, $b) {
                 return $a['order'] - $b['order'];
@@ -551,6 +567,7 @@ class WorkflowTransitionButtonsWidget extends Widget
      */
     public function getDraftButtonsToRender()
     {
+        $statusField = $this->statusField;
         $btns = [];
 
         if ($this->inView) {
@@ -586,10 +603,10 @@ class WorkflowTransitionButtonsWidget extends Widget
                 if ($this->model->getWorkflowStatus()->getId() != $this->hideSaveDraftStatus) {
                     //$saveButton = $closeSaveButtonWidgetD->saveHTML($closeSaveButtonWidgetD->getElementsByTagName('button')[0]);
                     if (!empty($this->draftButtons)) {
-                        if (array_key_exists($this->model->status, $this->draftButtons)) {
+                        if (array_key_exists($this->model->{$statusField}, $this->draftButtons)) {
                             $btns[] = [
-                                "button" => $this->draftButtons[$this->model->status]['button'],
-                                "stateDescriptor" => $this->draftButtons[$this->model->status]['description']
+                                "button" => $this->draftButtons[$this->model->{$statusField}]['button'],
+                                "stateDescriptor" => $this->draftButtons[$this->model->{$statusField}]['description']
                             ];
                         } else {
                             $btns[] = [
@@ -602,10 +619,10 @@ class WorkflowTransitionButtonsWidget extends Widget
             } else { // altrimenti verifico i parametri passati come array
                 if (!empty($this->draftButtons) && !in_array($this->model->getWorkflowStatus()->getId(),
                         $this->hideSaveDraftStatus)) {
-                    if (array_key_exists($this->model->status, $this->draftButtons)) {
+                    if (array_key_exists($this->model->{$statusField}, $this->draftButtons)) {
                         $btns[] = [
-                            "button" => $this->draftButtons[$this->model->status]['button'],
-                            "stateDescriptor" => $this->draftButtons[$this->model->status]['description']
+                            "button" => $this->draftButtons[$this->model->{$statusField}]['button'],
+                            "stateDescriptor" => $this->draftButtons[$this->model->{$statusField}]['description']
                         ];
                     } else {
                         $btns[] = [
@@ -627,8 +644,9 @@ class WorkflowTransitionButtonsWidget extends Widget
      */
     public function getAdditionalButtonsToRender()
     {
+        $statusField = $this->statusField;
         $btns = [];
-        $current_status = !empty($this->model->status) ? $this->model->status : null;
+        $current_status = !empty($this->model->{$statusField}) ? $this->model->{$statusField} : null;
         if (!empty($this->additionalButtons)) {
             foreach ($this->additionalButtons as $status => $additionalButtons) {
                 if ($status == 'default') {
@@ -658,17 +676,16 @@ class WorkflowTransitionButtonsWidget extends Widget
      */
     public function renderInputForNotify()
     {
-        if (!empty(\Yii::$app->getModule('notify'))
+        $notifyModule = \Yii::$app->getModule('notify');
+        if (!empty($notifyModule)
             && $this->model instanceof \open20\amos\notificationmanager\record\NotifyRecord
             && $this->model instanceof \open20\amos\core\interfaces\WorkflowModelInterface
             && $this->model instanceof ContentModel
         ) {
-            if ($this->model->hasProperty('saveNotificationSendEmail') && !empty(\Yii::$app->getModule('notify')->confirmEmailNotification)
-                && \Yii::$app->getModule('notify')->confirmEmailNotification == true) {
+            if ($this->model->hasProperty('saveNotificationSendEmail') && !empty($notifyModule->confirmEmailNotification) && $notifyModule->confirmEmailNotification == true) {
                 $validatedStatus = $this->model->getValidatedStatus();
                 $isValidatedOnce = $this->model->getValidatedOnce();
-                $emailNotificated = \open20\amos\notificationmanager\models\NotificationSendEmail::findOne(['classname' => get_class($this->model),
-                    'content_id' => $this->model->id]);
+                $emailNotificated = \open20\amos\notificationmanager\models\NotificationSendEmail::findOne(['classname' => get_class($this->model), 'content_id' => $this->model->id]);
                 if (empty($emailNotificated)) {
                     // the modal is shown if you click (Validate/publish) or after the validation if you have not selected yes on send notification
                     // the first time you click for submit open the modal enc do the prevent default, if in the modal click yes, trigger again the submit without open the modal
@@ -722,24 +739,20 @@ class WorkflowTransitionButtonsWidget extends Widget
                               clickValidateButton = false;
                           }
                      });
-                     
-                    
 JS;
                     $this->getView()->registerJs($js);
 
                     ModalUtility::createConfirmModal([
                         'id' => 'modal-notify-send-email',
                         'containerOptions' => ['class' => 'modal-utility'],
-                        'modalDescriptionText' => AmosWorkflow::tHtml('amosworkflow',
-                            'Vuoi inviare le email di avviso agli utenti per la pubblicazione di questo contenuto?'),
+                        'modalDescriptionText' => AmosWorkflow::tHtml('amosworkflow', 'Vuoi inviare le email di avviso agli utenti per la pubblicazione di questo contenuto?'),
                         'confirmBtnOptions' => ['id' => 'confirm-true', 'class' => 'btn btn-navigation-primary'],
                         'cancelBtnOptions' => ['id' => 'confirm-false', 'class' => 'btn btn-secondary', 'data-dismiss' => 'modal'],
                         'cancelBtnLabel' => AmosWorkflow::tHtml('amosworkflow', 'No'),
                         'confirmBtnLabel' => AmosWorkflow::tHtml('amosworkflow', 'Si'),
                     ]);
 
-                    return Html::hiddenInput('saveNotificationSendEmail', $this->model->saveNotificationSendEmail,
-                        ['id' => 'save-notification-send-email']);
+                    return Html::hiddenInput('saveNotificationSendEmail', $this->model->saveNotificationSendEmail, ['id' => 'save-notification-send-email']);
                 }
             }
         }

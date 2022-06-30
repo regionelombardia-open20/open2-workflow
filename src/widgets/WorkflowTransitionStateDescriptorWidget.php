@@ -142,7 +142,6 @@ class WorkflowTransitionStateDescriptorWidget extends Widget
     private $translationCategory;
 
     /**
-     * @see \kartik\base\Widget::init();
      *
      * Set of the permissionSave
      */
