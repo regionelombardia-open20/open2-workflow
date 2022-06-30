@@ -14,7 +14,7 @@
     "minimum-stability": "stable",
     "require": {
         "php": ">=5.4.0",
-        "open20/amos-core":"^1.9.50",
+        "open20/amos-core":"^1.26.0",
         "raoul2000/yii2-workflow": "^1.1.0",
         "cornernote/yii2-workflow-manager": "^1.0.1"
     },

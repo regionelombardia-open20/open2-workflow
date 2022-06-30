@@ -210,7 +210,6 @@ class WorkflowTransitionButtonsWidget extends Widget
         if (!$this->translationCategory) {
             $this->translationCategory = preg_replace('/[^aA-zZ]/i', '', ((strpos($moduleName, 'amos') === false) ? 'amos' : '') . $moduleName);
         }
-
         parent::init();
 
 //        if (!isset($this->initialStatus)) {
@@ -321,11 +320,11 @@ class WorkflowTransitionButtonsWidget extends Widget
              */
 
             // Se ho lo status settato, mostro i bottoni generati dal workflow
-
             if ($this->model->hasWorkflowStatus()) {
                 $buttonsGot = $this->getButtonsToRender(null, null, null, $this->customStatusLabelDescription);
                 $workflowStatusId = $this->model->getWorkflowStatus()->getId();
-            } else {
+
+            }  else {
                 // Altrimenti passo dei "fake status" (passati come parametro in _form) per generare i vari
                 // pulsanti
                 $buttonsGot = $this->getButtonsToRender($this->initialStatusName, $this->initialStatus, $this->statusToRender);
@@ -338,7 +337,7 @@ class WorkflowTransitionButtonsWidget extends Widget
                     if (!buttonId) {
                         buttonId = '" . $workflowStatusId . "' 
                     }
-                    $('#".$this->internalWorkflowStatusId."').val(buttonId);
+                    $('#" . $this->internalWorkflowStatusId . "').val(buttonId);
                 });
                 
                 $('[type=submit]').on('click', function(){
@@ -350,7 +349,6 @@ class WorkflowTransitionButtonsWidget extends Widget
 
             //$buttonsDom = new DOMDocument();
             //$buttonsDom->loadHTML($buttonsGot);
-
             $this->getView()->registerJs($js, \yii\web\View::POS_READY);
 
             // Per ogni bottone generato attraverso il workflow widget (e inserito nella variabile $buttonsGot)
@@ -369,7 +367,6 @@ class WorkflowTransitionButtonsWidget extends Widget
                     "stateDescriptor" => $button['stateDescriptor']
                 ];
             }
-
             $hiddenActions = $this->form->field($this->model, $this->statusField)->hiddenInput(['id' => $this->internalWorkflowStatusId])->label(false);
 
             $notificationInput = $this->renderInputForNotify();
@@ -423,7 +420,6 @@ class WorkflowTransitionButtonsWidget extends Widget
         $buttonsArr = [];
         $buttons = [];
         $module = ($this->module);
-
         $User = \Yii::$app->getUser();
         $inState = !$fakeStatus ? $this->model->getWorkflowStatus()->getId() : $fakeStatus;
 
@@ -435,6 +431,8 @@ class WorkflowTransitionButtonsWidget extends Widget
 
         if ($realState) {
             $this->model->{$statusField} = $realState->status;
+        } else if($this->model->isNewRecord && !empty($this->model->$statusField)){
+            $this->model->{$statusField} = $this->model->$statusField;
         } else {
             $this->model->{$statusField} = $fakeStatus;
         }
@@ -577,6 +575,7 @@ class WorkflowTransitionButtonsWidget extends Widget
     {
         $statusField = $this->statusField;
         $btns = [];
+        $draftClass= 'draft-button';
 
         if ($this->inView) {
             return $btns;
@@ -592,12 +591,14 @@ class WorkflowTransitionButtonsWidget extends Widget
                 if (array_key_exists($this->initialStatus, $this->draftButtons)) {
                     $btns[] = [
                         "button" => $this->draftButtons[$this->initialStatus]['button'],
-                        "stateDescriptor" => $this->draftButtons[$this->initialStatus]['description']
+                        "stateDescriptor" => $this->draftButtons[$this->initialStatus]['description'],
+                        "class" => $draftClass
                     ];
                 } else {
                     $btns[] = [
                         "button" => $this->draftButtons['default']['button'],
-                        "stateDescriptor" => $this->draftButtons['default']['description']
+                        "stateDescriptor" => $this->draftButtons['default']['description'],
+                        "class" => $draftClass
                     ];
                 }
             }
@@ -614,12 +615,16 @@ class WorkflowTransitionButtonsWidget extends Widget
                         if (array_key_exists($this->model->{$statusField}, $this->draftButtons)) {
                             $btns[] = [
                                 "button" => $this->draftButtons[$this->model->{$statusField}]['button'],
-                                "stateDescriptor" => $this->draftButtons[$this->model->{$statusField}]['description']
+                                "stateDescriptor" => $this->draftButtons[$this->model->{$statusField}]['description'],
+                                "class" => $draftClass
+
                             ];
                         } else {
                             $btns[] = [
                                 "button" => $this->draftButtons['default']['button'],
-                                "stateDescriptor" => $this->draftButtons['default']['description']
+                                "stateDescriptor" => $this->draftButtons['default']['description'],
+                                "class" => $draftClass
+
                             ];
                         }
                     }
@@ -630,12 +635,15 @@ class WorkflowTransitionButtonsWidget extends Widget
                     if (array_key_exists($this->model->{$statusField}, $this->draftButtons)) {
                         $btns[] = [
                             "button" => $this->draftButtons[$this->model->{$statusField}]['button'],
-                            "stateDescriptor" => $this->draftButtons[$this->model->{$statusField}]['description']
+                            "stateDescriptor" => $this->draftButtons[$this->model->{$statusField}]['description'],
+                            "class" => $draftClass
                         ];
                     } else {
                         $btns[] = [
                             "button" => $this->draftButtons['default']['button'],
-                            "stateDescriptor" => $this->draftButtons['default']['description']
+                            "stateDescriptor" => $this->draftButtons['default']['description'],
+                            "class" => $draftClass
+
                         ];
                     }
                 }
@@ -694,7 +702,9 @@ class WorkflowTransitionButtonsWidget extends Widget
                 if ($this->model->hasProperty('saveNotificationSendEmail') && !empty($notifyModule->confirmEmailNotification) && $notifyModule->confirmEmailNotification == true) {
                     $validatedStatus = $this->model->getValidatedStatus();
                     $isValidatedOnce = $this->model->getValidatedOnce();
+                    $isCurrentStatusValidated = ($this->model->getValidatedStatus() == $this->model->status) ? 1 : 0;
                     $emailNotificated = \open20\amos\notificationmanager\models\NotificationSendEmail::findOne(['classname' => get_class($this->model), 'content_id' => $this->model->id]);
+                    // ---- se non esisite il notification_send_email ----
                     if (empty($emailNotificated)) {
                         // the modal is shown if you click (Validate/publish) or after the validation if you have not selected yes on send notification
                         // the first time you click for submit open the modal enc do the prevent default, if in the modal click yes, trigger again the submit without open the modal
@@ -761,7 +771,107 @@ JS;
                             'confirmBtnLabel' => AmosWorkflow::tHtml('amosworkflow', 'Si'),
                         ]);
 
-                        return Html::hiddenInput('saveNotificationSendEmail', $this->model->saveNotificationSendEmail, ['id' => 'save-notification-send-email']);
+                        return Html::hiddenInput('saveNotificationSendEmail', $this->model->saveNotificationSendEmail, ['id' => 'save-notification-send-email'])
+                            .Html::hiddenInput('createUpdateNotification', 0, ['id' => 'create-update-notification']);
+
+                    } else if(\Yii::$app->user->can('RESEND_NOTIFICATION')){
+                    // ---- se esisite già il notification_send_email ----
+                        if (!$this->model->isNewRecord) {
+
+                            $js2 = <<<JS
+                    var clickedWorkflowTransitionButton = false; // this variable is used to avoid to open the modal if you don't click on submit buttons that aren't in the transition widget
+                    var modalShown = false;
+                    var clickedButtonsConfirm = false;
+                    var form = $('#modal-update-notification').parents('form');
+                    var isValidatedOnce = '$isValidatedOnce';
+                    var canUpdateNotification = false;
+                    
+                    var sometingChanged = false;
+                    
+                    //listeners per la modifica dei campi del form
+                    $(document).on('textEditorChange','.mce-tinymce + textarea', function(){
+                        sometingChanged = true;
+                    });
+                    $(document).on('change','input,select,textarea', function(){
+                        sometingChanged = true;
+                    });
+                    
+                    
+                    // al submit controlla se aprire  il modal
+                    $(document).on('submit','form', function(e){
+                         // e.preventDefault();
+                        if(!modalShown  && clickedWorkflowTransitionButton && sometingChanged && isValidatedOnce === '1' && canUpdateNotification) {
+                            e.preventDefault();
+                            $('#modal-update-notification').modal('show');
+                        }
+                        clickedWorkflowTransitionButton = false;
+                    });
+                    
+                    //evento di chiusura del modale
+                    $('#modal-update-notification').on('hidden.bs.modal', function () {
+                         modalShown = true;
+                         if(!clickedButtonsConfirm){
+                            $('#create-update-notification').val(0);
+                            $(form).trigger('submit');
+                        }
+                     });
+                    
+                    //evento di clik ok al modale
+                    $('#update-confirm-true').click(function(e){
+                         e.preventDefault();
+                         if(!clickedButtonsConfirm){
+                             modalShown = true;
+                             clickedButtonsConfirm = true;
+                            $('#create-update-notification').val(1);
+                            $(form).trigger('submit');
+                        }
+                    });
+                    
+                     //evento di clik annulla al modale
+                     $('#upadate-confirm-false').click(function(e){
+                         e.preventDefault();
+                         if(!clickedButtonsConfirm){
+                             modalShown = true;
+                             clickedButtonsConfirm = true;
+                             $('#create-update-notification').val(0);
+                            $(form).trigger('submit');
+                        }
+                    });
+                     
+                       // verifico che ho cliccato un submit nel widget del workflow e se posso aprire  il modale per l'aggiornamento notifiche
+                       $('.workflow-transition-button-widget button[type="submit"]').click(function(){
+                         clickedWorkflowTransitionButton = true;
+                           var isDraftAndValidated  = false;
+                           var clickValidateButton = false;
+                           if($(this).attr('id') === '$validatedStatus'){
+                              clickValidateButton = true;
+                          } else {
+                              clickValidateButton = false;
+                          }
+                          
+                          if('$isCurrentStatusValidated' === '1' && $(this).parents('.draft-button').length){
+                               isDraftAndValidated = true;
+                          }
+                          canUpdateNotification = isDraftAndValidated || clickValidateButton;
+                     });
+    
+JS;
+                            $this->getView()->registerJs($js2);
+
+                            ModalUtility::createConfirmModal([
+                                'id' => 'modal-update-notification',
+                                'containerOptions' => ['class' => 'modal-utility'],
+                                'modalDescriptionText' => AmosWorkflow::tHtml('amosworkflow', 'Vuoi reinviare una notifica per questo contenuto?'),
+                                'confirmBtnOptions' => ['id' => 'update-confirm-true', 'class' => 'btn btn-navigation-primary'],
+                                'cancelBtnOptions' => ['id' => 'update-confirm-false', 'class' => 'btn btn-secondary', 'data-dismiss' => 'modal'],
+                                'cancelBtnLabel' => AmosWorkflow::tHtml('amosworkflow', 'No'),
+                                'confirmBtnLabel' => AmosWorkflow::tHtml('amosworkflow', 'Si'),
+                            ]);
+                            return Html::hiddenInput('createUpdateNotification', 0, ['id' => 'create-update-notification']);
+
+                        }
+                    }else{
+                        return Html::hiddenInput('createUpdateNotification', 0, ['id' => 'create-update-notification']);
                     }
                 }
             }

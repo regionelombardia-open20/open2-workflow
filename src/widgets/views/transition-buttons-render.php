@@ -27,7 +27,12 @@
     </div>
     <div class="workflow-buttons-container nop">
         <?php foreach ($buttons as $button) : ?>
-            <div class="workflow-form-actions workflow-button-container m-t-10 m-b-10">
+        <?php
+            $class = '';
+            if(!empty($button['class'])){
+            $class = $button['class'];
+            }?>
+            <div class="workflow-form-actions workflow-button-container m-t-10 m-b-10 <?= $class?>">
                 <?= $button['button']; ?>
                 <p><?= $button['stateDescriptor'] ?></p>
             </div>
