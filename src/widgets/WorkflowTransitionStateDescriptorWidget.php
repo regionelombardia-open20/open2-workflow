@@ -141,7 +141,23 @@ class WorkflowTransitionStateDescriptorWidget extends Widget
      */
     private $translationCategory;
 
+    public $forceStatusLabel;
+
     /**
+     * @var array $translationCategory
+     */
+    private $customStatusLabelDescription;
+    
+    
+    public function getCustomStatusLabelDescription() {
+        return $this->customStatusLabelDescription;
+    }
+
+    public function setCustomStatusLabelDescription($customStatusLabelDescription) {
+        $this->customStatusLabelDescription = $customStatusLabelDescription;
+    }
+
+        /**
      *
      * Set of the permissionSave
      */
@@ -152,7 +168,7 @@ class WorkflowTransitionStateDescriptorWidget extends Widget
         $moduleName = $controller->module->uniqueId;
         $this->module = \Yii::$app->getModule($moduleName);
         if (!$this->translationCategory) {
-            $this->translationCategory = preg_replace('/[^aA-zZ]/i', '', 'amos' . $moduleName);
+            $this->translationCategory = preg_replace('/[^aA-zZ]/i', '', ((strpos($moduleName, 'amos') === false) ? 'amos' : '') . $moduleName);
         }
 
         parent::init();
@@ -249,7 +265,16 @@ class WorkflowTransitionStateDescriptorWidget extends Widget
         $content = '';
         $module = ($this->module);
         if ($this->model->hasWorkflowStatus()) {
-            $status = $module::t($this->translationCategory, WorkflowTransitionWidgetUtility::getLabelStatus($this->model));
+            $status = '';
+            if(!is_null($this->customStatusLabelDescription) && is_array($this->customStatusLabelDescription)){
+                if(isset($this->customStatusLabelDescription[$this->model->getWorkflowStatus()->getId()])){
+                    $status = $module::t($this->translationCategory, $this->customStatusLabelDescription[$this->model->getWorkflowStatus()->getId()]);
+                }
+                
+            }
+            if(empty($status)){
+                $status = $module::t($this->translationCategory, WorkflowTransitionWidgetUtility::getLabelStatus($this->model));
+            }
             $js = "
                 $('form').on('submit', function (e) {
                     var buttonId = $('[clicked=true]').attr('id');
@@ -280,6 +305,13 @@ class WorkflowTransitionStateDescriptorWidget extends Widget
              */
             $modelStatus = $this->model->{$this->model->statusAttribute};
             $status = $module::t($this->translationCategory, WorkflowTransitionWidgetUtility::getLabelStatus($this->model, $modelStatus));
+
+            if(!empty($this->forceStatusLabel) && !empty($this->model) && !empty($modelStatus)) {
+                if(array_key_exists($this->model->getWorkflowStatus()->getId(), $this->forceStatusLabel)) {
+                    $status = $this->forceStatusLabel[$modelStatus];
+                }
+            }
+
             $content = '
             <div class="' . $this->containerWidgetClass . '">
                     <div' . (isset($this->classDivMessage) ? ' class="' . $this->classDivMessage . '"' : '') . '>

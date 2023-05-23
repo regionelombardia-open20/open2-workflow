@@ -161,7 +161,7 @@ class WorkflowTransitionWidget extends Widget
         $moduleName = $controller->module->uniqueId;
         $this->module = \Yii::$app->getModule($moduleName);
         if (!$this->translationCategory) {
-            $this->translationCategory = preg_replace('/[^aA-zZ]/i', '', 'amos' . $moduleName);
+            $this->translationCategory = preg_replace('/[^aA-zZ]/i', '', ((strpos($moduleName, 'amos') === false) ? 'amos' : '') . $moduleName);
         }
         
         parent::init();

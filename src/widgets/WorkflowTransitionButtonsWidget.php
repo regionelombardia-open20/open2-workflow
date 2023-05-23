@@ -198,6 +198,11 @@ class WorkflowTransitionButtonsWidget extends Widget
     public $statusField = 'status';
 
     /**
+     * @var bool
+     */
+    public $personalized_render_buttons;
+
+    /**
      *
      * Set of the permissionSave
      */
@@ -327,7 +332,7 @@ class WorkflowTransitionButtonsWidget extends Widget
             }  else {
                 // Altrimenti passo dei "fake status" (passati come parametro in _form) per generare i vari
                 // pulsanti
-                $buttonsGot = $this->getButtonsToRender($this->initialStatusName, $this->initialStatus, $this->statusToRender);
+                $buttonsGot = $this->getButtonsToRender($this->initialStatusName, $this->initialStatus, $this->statusToRender, $this->customStatusLabelDescription);
                 $workflowStatusId = $this->initialStatus;
             }
 
@@ -358,18 +363,30 @@ class WorkflowTransitionButtonsWidget extends Widget
             foreach ($buttonsGot as $key => $button) {
                 $buttonsDom = new DOMDocument();
                 $buttonsDom->loadHTML($button['button']);
-                $buttonsDom->getElementsByTagName('button')[0]->setAttribute('class',
-                    ($key == sizeof($buttonsGot) - 1) ? 'btn btn-navigation-primary' : 'btn btn-workflow');
-                $btn = $buttonsDom->saveHTML($buttonsDom->getElementsByTagName('button')[0]);
+                if (!empty($buttonsDom->getElementsByTagName('button')[0])) {
+                    $buttonsDom->getElementsByTagName('button')[0]->setAttribute('class',
+                        ($key == sizeof($buttonsGot) - 1) ? 'btn btn-navigation-primary' : 'btn btn-workflow');
+                    $btn = $buttonsDom->saveHTML($buttonsDom->getElementsByTagName('button')[0]);
 
-                $btns[] = [
-                    "button" => $btn,
-                    "stateDescriptor" => $button['stateDescriptor']
-                ];
+                    $btns[] = [
+                        "button" => $btn,
+                        "stateDescriptor" => $button['stateDescriptor']
+                    ];
+                }
             }
             $hiddenActions = $this->form->field($this->model, $this->statusField)->hiddenInput(['id' => $this->internalWorkflowStatusId])->label(false);
 
             $notificationInput = $this->renderInputForNotify();
+
+            if(!empty($this->personalized_render_buttons)){
+                return  $this->render($this->personalized_render_buttons, [
+                    'widgetClass' => $this->containerWidgetClass,
+                    'resetButton' => $this->closeButton,
+                    'buttons' => $btns,
+                    'hiddenActions' => $hiddenActions,
+                    'renderStatusError' => $this->renderStatusError($hiddenActions),
+                ]);
+            }
 
             // Renderizzo separatamente una view con tutti i bottoni
             return $this->render("transition-buttons-render", [
