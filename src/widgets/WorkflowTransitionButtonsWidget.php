@@ -115,6 +115,11 @@ class WorkflowTransitionButtonsWidget extends Widget
     public $dataConfirm;
 
     /**
+     * @var bool
+     */
+    public $enableDataConfirm = true;
+
+    /**
      * @var bool $viewWidgetOnNewRecord If true force to view the widget when the model is in new record state
      */
     public $viewWidgetOnNewRecord = false;
@@ -509,7 +514,10 @@ class WorkflowTransitionButtonsWidget extends Widget
                             }
                         }
 
-                        $dataConfirm = WorkflowTransitionWidgetUtility::getStatusButtonDataConfirm($module, $this->model, $metadati, $currentStatus, $this->translationCategory);
+                        $dataConfirm = null;
+                        if($this->enableDataConfirm) {
+                            $dataConfirm = WorkflowTransitionWidgetUtility::getStatusButtonDataConfirm($module, $this->model, $metadati, $currentStatus, $this->translationCategory);
+                        }
 
                         $buttons[] = [
                             'button' => CloseSaveButtonWidget::widget([
