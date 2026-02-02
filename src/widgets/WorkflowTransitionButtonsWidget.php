@@ -519,19 +519,26 @@ class WorkflowTransitionButtonsWidget extends Widget
                             $dataConfirm = WorkflowTransitionWidgetUtility::getStatusButtonDataConfirm($module, $this->model, $metadati, $currentStatus, $this->translationCategory);
                         }
 
+                        $closeSaveButtonConfig = [
+                            'model' => $this->model,
+                            'layout' => $this->buttonLayout,
+                            'buttonSaveLabel' => $buttonLabel,
+                            'buttonNewSaveLabel' => $buttonLabel,
+                            'buttonClassSave' => 'btn',
+                            'buttonId' => $key,
+                        ];
+
+                        $hideConfirm = isset($metadati['hideConfirm']) && $metadati['hideConfirm'];
+                        if(!$hideConfirm) {
+                            $closeSaveButtonConfig['dataConfirm'] = $dataConfirm;
+                        }
+
                         $buttons[] = [
-                            'button' => CloseSaveButtonWidget::widget([
-                                'model' => $this->model,
-                                'layout' => $this->buttonLayout,
-                                'buttonSaveLabel' => $buttonLabel,
-                                'buttonNewSaveLabel' => $buttonLabel,
-                                'buttonClassSave' => 'btn',
-                                'buttonId' => $key,
-                                'dataConfirm' => $dataConfirm
-                            ]),
+                            'button' => CloseSaveButtonWidget::widget($closeSaveButtonConfig),
                             'stateDescriptor' => $stateDescriptor,
                             'order' => ((isset($metadati['order']) && is_numeric($metadati['order'])) ? $metadati['order'] : 0)
                         ];
+
                     }
                 }
             }
